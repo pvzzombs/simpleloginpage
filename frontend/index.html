@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="js/cookieHandler.js"></script>
+    <script>
+        if (getCookie("sessionid") != null) {
+            window.location.replace("./home");
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <a href="./registration.html"> Register here </a>
+    </div>
+
+    <script src="js/axios.min.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Get the form data
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username == "" || password == "") {
+                alert("Please kindly fill up the required fields.")
+                return;
+            }
+
+            axios.post("http://localhost:1234/login",{
+                username, password
+            }).then(function(response){
+                var status = response.data.status;
+                if (status === "failed") {
+                    alert("Login Unsuccessful!");
+                    return;
+                } else {
+                    var sessionid = response.data.sessionid;
+                    setCookie("username", username, 1);
+                    setCookie("sessionid", sessionid, 1);
+                    window.location.replace("home.html");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
