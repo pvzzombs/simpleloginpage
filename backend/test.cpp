@@ -51,14 +51,6 @@ namespace uuid
   }
 }
 
-class User
-{
-public:
-  long id;
-  std::string username;
-  std::string password;
-};
-
 void allowCORS(httplib::Response &res) {
   res.set_header("Access-Control-Allow-Origin", "*");
   res.set_header("Allow", "GET, POST, HEAD, OPTIONS");
@@ -69,10 +61,6 @@ void allowCORS(httplib::Response &res) {
 int main(void)
 {
   using namespace httplib;
-
-  long currentID = 0;
-  std::vector<User> users;
-  std::unordered_map<std::string, std::string> sessiomStore;
 
   std::cout << "Preparing database" << std::endl;
   Sqlite::SqliteConnection connection("test.db");
@@ -115,13 +103,6 @@ int main(void)
     nlohmann::json j = nlohmann::json::parse(req.body);
     std::string userName = j["username"];
     std::string userSessionID = j["sessionid"];
-    // if (sessiomStore.count(userName) > 0) {
-    //   if (sessiomStore[userName] == userSessionID) {
-    //     sessiomStore.erase(userName);
-    //     res.set_content("{\"status\":\"success\"}", "text/json");
-    //     return;
-    //   }
-    // }
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions")) {
       if (row.getString(0) == userName) {
@@ -141,9 +122,9 @@ int main(void)
            {
     allowCORS(res);
     nlohmann::json j = nlohmann::json::parse(req.body);
-    User newUser;
-    newUser.username = j["username"];
-    newUser.password = j["password"];
+    std::string userName = j["username"];
+    std::string passWord = j["password"];
+
     // for (size_t i = 0; i < users.size(); i++) {
     //   if (users.at(i).username == newUser.username) {
     //     res.set_content("{\"status\":\"failed\"}", "text/json");
@@ -153,7 +134,7 @@ int main(void)
 
     // cancel if username already exists
     for (auto row: Sqlite::SqliteStatement(connection, "select username from users")) {
-      if (row.getString(0) == newUser.username) {
+      if (row.getString(0) == userName) {
         std::cout << "Username already exists" << std::endl;
         res.set_content("{\"status\":\"failed\"}", "text/json");
         return;
@@ -162,7 +143,7 @@ int main(void)
     // asuume no new user is the same
     // newUser.id = ++currentID;
     // users.push_back(newUser);
-    Sqlite::sqliteExecute(connection, "insert into users(username, password) values (?, ?)", newUser.username, newUser.password);
+    Sqlite::sqliteExecute(connection, "insert into users(username, password) values (?, ?)", userName, passWord);
     std::cout << "Regiter success" << std::endl;
     res.set_content("{\"status\":\"success\"}", "text/json"); });
 
@@ -173,32 +154,12 @@ int main(void)
            {
     allowCORS(res);
     nlohmann::json j = nlohmann::json::parse(req.body);
-    User oldUser;
-    oldUser.username = j["username"];
-    oldUser.password = j["password"];
-    // for (auto &e: users) {
-    //   if (oldUser.username == e.username) {
-    //     // storedUser = &e;
-    //     // match, check password
-    //     if (e.password == oldUser.password) {
-    //       std::string newUUID = uuid::generate_uuid_v4();
-    //       if (sessiomStore.count(e.username) == 0) {
-    //         // made a uniqued session id, store it
-    //         nlohmann::json successJSON;
-    //         successJSON["sessionid"] = newUUID;
-    //         successJSON["status"] = "success";
-    //         sessiomStore[e.username] = newUUID;
-    //         res.set_header("Set-Cookie", std::string("") + "session_id=" + newUUID + "; Path=/; HttpOnly; Secure");
-    //         res.set_content(successJSON.dump(), "text/json");
-    //         return;
-    //       }
-    //     }
-    //   }
-    // }
+    std::string userName = j["username"];
+    std::string passWord = j["password"];
 
     // if already logged in
     for (auto row: Sqlite::SqliteStatement(connection, "select username from sessions")) {
-      if (row.getString(0) == oldUser.username) {
+      if (row.getString(0) == userName) {
         res.set_content("{\"status\":\"failed\"}", "text/json");
         return;
       }
@@ -207,15 +168,15 @@ int main(void)
     // check credentials
     // then return sessionid
     for (auto row: Sqlite::SqliteStatement(connection, "select username, password from users")) {
-      if (row.getString(0) == oldUser.username) {
-        if (row.getString(1) == oldUser.password) {
+      if (row.getString(0) == userName) {
+        if (row.getString(1) == passWord) {
           nlohmann::json successJSON;
           std::string newUUID = uuid::generate_uuid_v4();
           successJSON["sessionid"] = newUUID;
           successJSON["status"] = "success";
           // sessiomStore[e.username] = newUUID;
           // res.set_header("Set-Cookie", std::string("") + "session_id=" + newUUID + "; Path=/; HttpOnly; Secure");
-          Sqlite::sqliteExecute(connection, "insert into sessions(username, sessionid) values (?, ?)", oldUser.username, newUUID);
+          Sqlite::sqliteExecute(connection, "insert into sessions(username, sessionid) values (?, ?)", userName, newUUID);
           std::cout << "Login success" << std::endl;
           res.set_content(successJSON.dump(), "text/json");
           return;
