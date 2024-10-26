@@ -67,33 +67,6 @@ int main(void)
 
   Server svr;
 
-  // svr.Get("/users", [&](const Request &req, Response &res)
-  //         {
-  //   std::string str = "";
-  //   str += "[";
-  //   for (auto &e: users) {
-  //     str += e.username;
-  //     str +=", ";
-  //   }
-  //   str += "]";
-  //   res.set_content(str, "text/plain"); });
-
-  // svr.Get("/verify", [&](const Request &req, Response &res)
-  //         {
-  //   std::string str;
-  //   if (req.has_param("username") && req.has_param("sessionid")) {
-  //     std::string userName = req.get_param_value("username");
-  //     std::string userUUID = req.get_param_value("sessionid");
-  //     if (sessiomStore.count(userName) > 0) {
-  //       if (sessiomStore[userName] == userUUID) {
-  //         str += userName;
-  //         str += " is logged in!";
-  //         res.set_content(str, "text/plain");
-  //         return;
-  //       }
-  //     }
-  //   }
-  //   res.set_content("Unable to verify, maybe logged out", "text/plain"); });
   svr.Options("/list/delete", [&](const Request &req, Response &res){
     allowCORS(res);
   });
