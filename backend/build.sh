@@ -1,4 +1,4 @@
 # gcc -Wall -Iinclude -c sqlite3.c -o sqlite3.o
-g++ -Wall -std=c++11 -IC:/usr/local/include -Iinclude -c test.cpp -o test.o
-g++ test.o -LC:/usr/local/lib -lsqlite3 -lws2_32 -o test.exe
+g++ -Wall -std=c++11 -IC:/usr/local/include -Iinclude -c server.cpp -o server.o
+g++ server.o -LC:/usr/local/lib -lsqlite3 -lws2_32 -o server.exe
 # gcc -Wall -Iinclude shell.c sqlite3.c -o shell.exe
