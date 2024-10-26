@@ -5,7 +5,7 @@
   <title>Document</title>
   <script src="js/cookieHandler.js"></script>
   <script>
-    if (getCookie("sessionid") === null) {
+    if (localStorage.getItem("sessionid") === null) {
       window.location.replace("/");
     }
   </script>
@@ -13,6 +13,9 @@
 <body>
   <h1 id="banner"> Banner Here </h1>
     <input type="button" value="Logout" id="logout">
+    <input type="button" value="Delete all" id="delete">
+    <input type="button" value="Insert" id="insert">
+  <div id="list"></div>
   <script src="js/axios.min.js"></script>
   <script src="js/home.js"></script>
 </body>

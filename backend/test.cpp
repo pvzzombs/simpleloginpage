@@ -94,6 +94,69 @@ int main(void)
   //     }
   //   }
   //   res.set_content("Unable to verify, maybe logged out", "text/plain"); });
+  svr.Options("/list/delete", [&](const Request &req, Response &res){
+    allowCORS(res);
+  });
+  svr.Post("/list/delete", [&](const Request &req, Response &res){
+    allowCORS(res);
+    nlohmann::json j = nlohmann::json::parse(req.body);
+    std::string userName = j["username"];
+    std::string sessionID = j["sessionid"];
+    
+    for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
+      if (row.getString(0) == userName && row.getString(1) == sessionID) {
+        Sqlite::sqliteExecute(connection, "delete from todo where username = ?", userName);
+        res.set_content("{\"status\":\"success\"}", "text/json");
+        return;
+      }
+    }
+    res.set_content("{\"status\":\"failed\"}", "text/json");
+  });
+
+  svr.Options("/list/insert", [&](const Request &req, Response &res){
+    allowCORS(res);
+  });
+  svr.Post("/list/insert", [&](const Request &req, Response &res){
+    allowCORS(res);
+    nlohmann::json j = nlohmann::json::parse(req.body);
+    std::string userName = j["username"];
+    std::string sessionID = j["sessionid"];
+    std::string todoItem = j["item"];
+
+    for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
+      if (row.getString(0) == userName && row.getString(1) == sessionID) {
+        Sqlite::sqliteExecute(connection, "insert into todo(username, item) values(?, ?)", userName, todoItem);
+        res.set_content("{\"status\":\"success\"}", "text/json");
+        return;
+      }
+    }
+    res.set_content("{\"status\":\"failed\"}", "text/json");
+  });
+
+  svr.Options("/list", [&](const Request &req, Response &res){
+    allowCORS(res);
+  });
+  svr.Get("/list", [&](const Request &req, Response &res){
+    allowCORS(res);
+    if (req.has_param("username") && req.has_param("sessionid")) {
+      std::string userName = req.get_param_value("username");
+      std::string sessionID = req.get_param_value("sessionid");
+
+      for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
+        if (row.getString(0) == userName && row.getString(1) == sessionID) {
+          nlohmann::json j;
+          j["list"] = {};
+          for (auto item: Sqlite::SqliteStatement(connection, "select username, item from todo where username = ?", userName)) {
+            j["list"].push_back(item.getString(1));
+          }
+          res.set_content("{\"status\":\"success\", \"data\":" + j.dump() + "}", "text/json");
+          return;
+        }
+      }
+    }
+    res.set_content("{\"status\":\"failed\"}", "text/json");
+  });
+
   svr.Options("/logout", [&](const Request &req, Response &res){
     allowCORS(res);
   });
@@ -104,8 +167,8 @@ int main(void)
     std::string userName = j["username"];
     std::string userSessionID = j["sessionid"];
 
-    for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions")) {
-      if (row.getString(0) == userName) {
+    for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
+      if (row.getString(0) == userName && row.getString(1) == userSessionID) {
         Sqlite::sqliteExecute(connection, "delete from sessions where username = ?", userName);
         std::cout << "Logout success" << std::endl;
         res.set_content("{\"status\":\"success\"}", "text/json");
@@ -133,7 +196,7 @@ int main(void)
     // }
 
     // cancel if username already exists
-    for (auto row: Sqlite::SqliteStatement(connection, "select username from users")) {
+    for (auto row: Sqlite::SqliteStatement(connection, "select username from users where username = ?", userName)) {
       if (row.getString(0) == userName) {
         std::cout << "Username already exists" << std::endl;
         res.set_content("{\"status\":\"failed\"}", "text/json");
@@ -158,7 +221,7 @@ int main(void)
     std::string passWord = j["password"];
 
     // if already logged in
-    for (auto row: Sqlite::SqliteStatement(connection, "select username from sessions")) {
+    for (auto row: Sqlite::SqliteStatement(connection, "select username from sessions where username = ?", userName)) {
       if (row.getString(0) == userName) {
         res.set_content("{\"status\":\"failed\"}", "text/json");
         return;
@@ -167,7 +230,7 @@ int main(void)
 
     // check credentials
     // then return sessionid
-    for (auto row: Sqlite::SqliteStatement(connection, "select username, password from users")) {
+    for (auto row: Sqlite::SqliteStatement(connection, "select username, password from users where username = ?", userName)) {
       if (row.getString(0) == userName) {
         if (row.getString(1) == passWord) {
           nlohmann::json successJSON;

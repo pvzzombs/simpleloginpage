@@ -21,8 +21,10 @@
         return;
       } else {
         var sessionid = response.data.sessionid;
-        setCookie("username", username, 1);
-        setCookie("sessionid", sessionid, 1);
+        // setCookie("username", username, 1);
+        // setCookie("sessionid", sessionid, 1);
+        localStorage.setItem("username", username);
+        localStorage.setItem("sessionid", sessionid);
         window.location.replace("home.html");
       }
     });

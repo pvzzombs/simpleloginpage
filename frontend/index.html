@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="js/cookieHandler.js"></script>
     <script>
-        if (getCookie("sessionid") != null) {
+        if (localStorage.getItem("sessionid") != null) {
             window.location.replace("./home");
         }
     </script>
