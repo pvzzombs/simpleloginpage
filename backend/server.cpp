@@ -9,6 +9,7 @@
 #include <httplib.h>
 #include <json.hpp>
 #include <sqlitewrapper.hpp>
+#include <sodium.h>
 
 namespace uuid
 {
@@ -58,11 +59,33 @@ void allowCORS(httplib::Response &res) {
   res.set_header("Access-Control-Allow-Methods", "OPTIONS, GET, POST, HEAD");
 }
 
+std::string hash_password(std::string password) {
+  // password hash len
+  char passwordHash[crypto_pwhash_STRBYTES];
+  if (crypto_pwhash_str(passwordHash, password.c_str(), password.size(), crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE) != 0) {
+    throw ;
+  }
+  return std::string(passwordHash);
+}
+
+bool verify_password(std::string password, std::string passwordHash) {
+  return crypto_pwhash_str_verify(passwordHash.c_str(), password.c_str(), password.size()) == 0;
+}
+
 int main(void)
 {
   using namespace httplib;
 
-  std::cout << "Preparing database" << std::endl;
+  if (sodium_init() < 0) {
+    std::cout << "libsodium not working" << std::endl;
+    return 1;
+  }
+
+  // std::string pwdhash = hash_password("abc");
+  // std::cout << "Password hash of abc: " << pwdhash << std::endl;
+  // std::cout << verify_password("abc", pwdhash) << std::endl;
+
+  std::cout << "Preparing database..." << std::endl;
   Sqlite::SqliteConnection connection("test.db");
 
   Server svr;
@@ -77,7 +100,7 @@ int main(void)
     std::string sessionID = j["sessionid"];
     
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
-      if (row.getString(0) == userName && row.getString(1) == sessionID) {
+      if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
         Sqlite::sqliteExecute(connection, "delete from todo where username = ?", userName);
         res.set_content("{\"status\":\"success\"}", "text/json");
         return;
@@ -97,7 +120,7 @@ int main(void)
     std::string todoItem = j["item"];
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
-      if (row.getString(0) == userName && row.getString(1) == sessionID) {
+      if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
         Sqlite::sqliteExecute(connection, "insert into todo(username, item) values(?, ?)", userName, todoItem);
         res.set_content("{\"status\":\"success\"}", "text/json");
         return;
@@ -116,7 +139,7 @@ int main(void)
       std::string sessionID = req.get_param_value("sessionid");
 
       for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
-        if (row.getString(0) == userName && row.getString(1) == sessionID) {
+        if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
           nlohmann::json j;
           j["list"] = {};
           for (auto item: Sqlite::SqliteStatement(connection, "select username, item from todo where username = ?", userName)) {
@@ -141,7 +164,7 @@ int main(void)
     std::string userSessionID = j["sessionid"];
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
-      if (row.getString(0) == userName && row.getString(1) == userSessionID) {
+      if (row.getString(0) == userName && verify_password(userSessionID, row.getString(1))) {
         Sqlite::sqliteExecute(connection, "delete from sessions where username = ?", userName);
         std::cout << "Logout success" << std::endl;
         res.set_content("{\"status\":\"success\"}", "text/json");
@@ -160,6 +183,7 @@ int main(void)
     nlohmann::json j = nlohmann::json::parse(req.body);
     std::string userName = j["username"];
     std::string passWord = j["password"];
+    std::string passWordHash = hash_password(passWord);
 
     // for (size_t i = 0; i < users.size(); i++) {
     //   if (users.at(i).username == newUser.username) {
@@ -179,7 +203,7 @@ int main(void)
     // asuume no new user is the same
     // newUser.id = ++currentID;
     // users.push_back(newUser);
-    Sqlite::sqliteExecute(connection, "insert into users(username, password) values (?, ?)", userName, passWord);
+    Sqlite::sqliteExecute(connection, "insert into users(username, password) values (?, ?)", userName, passWordHash);
     std::cout << "Regiter success" << std::endl;
     res.set_content("{\"status\":\"success\"}", "text/json"); });
 
@@ -205,14 +229,15 @@ int main(void)
     // then return sessionid
     for (auto row: Sqlite::SqliteStatement(connection, "select username, password from users where username = ?", userName)) {
       if (row.getString(0) == userName) {
-        if (row.getString(1) == passWord) {
+        if (verify_password(passWord, row.getString(1))) {
           nlohmann::json successJSON;
           std::string newUUID = uuid::generate_uuid_v4();
+          std::string newUUIDHash = hash_password(newUUID);
           successJSON["sessionid"] = newUUID;
           successJSON["status"] = "success";
           // sessiomStore[e.username] = newUUID;
           // res.set_header("Set-Cookie", std::string("") + "session_id=" + newUUID + "; Path=/; HttpOnly; Secure");
-          Sqlite::sqliteExecute(connection, "insert into sessions(username, sessionid) values (?, ?)", userName, newUUID);
+          Sqlite::sqliteExecute(connection, "insert into sessions(username, sessionid) values (?, ?)", userName, newUUIDHash);
           std::cout << "Login success" << std::endl;
           res.set_content(successJSON.dump(), "text/json");
           return;

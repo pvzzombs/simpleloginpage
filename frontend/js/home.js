@@ -22,6 +22,9 @@
   document.getElementById("insert").onclick = function (e) {
     e.preventDefault();
     var item = prompt("Insert value:");
+    if (item === "") {
+      return;
+    }
     axios.post("http://localhost:1234/list/insert", {
       username,
       sessionid,
