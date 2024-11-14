@@ -54,7 +54,7 @@ function Register() {
   return (
     <div className="container">
       <h2>Register</h2>
-      <form id="registrationForm">
+      <form id="registrationForm" onSubmit={tryRegister}>
         <div className="input-group">
           <label htmlFor="username">Username</label>
           <input type="text" id="username" name="username" required />
@@ -72,7 +72,7 @@ function Register() {
             required
           />
         </div>
-        <button onClick={tryRegister}>Register</button>
+        <button type="submit">Register</button>
       </form>
       <a href="./"> Login here </a>
     </div>
