@@ -102,11 +102,11 @@ int main(void)
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
         Sqlite::sqliteExecute(connection, "delete from todo where username = ?", userName);
-        res.set_content("{\"status\":\"success\"}", "text/json");
+        res.set_content("{\"status\":\"success\"}", "application/json");
         return;
       }
     }
-    res.set_content("{\"status\":\"failed\"}", "text/json");
+    res.set_content("{\"status\":\"failed\"}", "application/json");
   });
 
   svr.Options("/list/insert", [&](const Request &req, Response &res){
@@ -122,11 +122,11 @@ int main(void)
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
         Sqlite::sqliteExecute(connection, "insert into todo(username, item) values(?, ?)", userName, todoItem);
-        res.set_content("{\"status\":\"success\"}", "text/json");
+        res.set_content("{\"status\":\"success\"}", "application/json");
         return;
       }
     }
-    res.set_content("{\"status\":\"failed\"}", "text/json");
+    res.set_content("{\"status\":\"failed\"}", "application/json");
   });
 
   svr.Options("/list", [&](const Request &req, Response &res){
@@ -145,12 +145,12 @@ int main(void)
           for (auto item: Sqlite::SqliteStatement(connection, "select username, item from todo where username = ?", userName)) {
             j["list"].push_back(item.getString(1));
           }
-          res.set_content("{\"status\":\"success\", \"data\":" + j.dump() + "}", "text/json");
+          res.set_content("{\"status\":\"success\", \"data\":" + j.dump() + "}", "application/json");
           return;
         }
       }
     }
-    res.set_content("{\"status\":\"failed\"}", "text/json");
+    res.set_content("{\"status\":\"failed\"}", "application/json");
   });
 
   svr.Options("/logout", [&](const Request &req, Response &res){
@@ -167,13 +167,13 @@ int main(void)
       if (row.getString(0) == userName && verify_password(userSessionID, row.getString(1))) {
         Sqlite::sqliteExecute(connection, "delete from sessions where username = ?", userName);
         std::cout << "Logout success" << std::endl;
-        res.set_content("{\"status\":\"success\"}", "text/json");
+        res.set_content("{\"status\":\"success\"}", "application/json");
         return;
       }
     }
 
     std::cout << "Logout failed" << std::endl;
-    res.set_content("{\"status\":\"failed\"}", "text/json");});
+    res.set_content("{\"status\":\"failed\"}", "application/json");});
   svr.Options("/register", [&](const Request &req, Response &res){
     allowCORS(res);
   });
@@ -187,7 +187,7 @@ int main(void)
 
     // for (size_t i = 0; i < users.size(); i++) {
     //   if (users.at(i).username == newUser.username) {
-    //     res.set_content("{\"status\":\"failed\"}", "text/json");
+    //     res.set_content("{\"status\":\"failed\"}", "application/json");
     //     return;
     //   }
     // }
@@ -196,7 +196,7 @@ int main(void)
     for (auto row: Sqlite::SqliteStatement(connection, "select username from users where username = ?", userName)) {
       if (row.getString(0) == userName) {
         std::cout << "Username already exists" << std::endl;
-        res.set_content("{\"status\":\"failed\"}", "text/json");
+        res.set_content("{\"status\":\"failed\"}", "application/json");
         return;
       }
     }
@@ -205,7 +205,7 @@ int main(void)
     // users.push_back(newUser);
     Sqlite::sqliteExecute(connection, "insert into users(username, password) values (?, ?)", userName, passWordHash);
     std::cout << "Regiter success" << std::endl;
-    res.set_content("{\"status\":\"success\"}", "text/json"); });
+    res.set_content("{\"status\":\"success\"}", "application/json"); });
 
   svr.Options("/login", [&](const Request &req, Response &res){
     allowCORS(res);
@@ -220,7 +220,7 @@ int main(void)
     // if already logged in
     for (auto row: Sqlite::SqliteStatement(connection, "select username from sessions where username = ?", userName)) {
       if (row.getString(0) == userName) {
-        res.set_content("{\"status\":\"failed\"}", "text/json");
+        res.set_content("{\"status\":\"failed\"}", "application/json");
         return;
       }
     }
@@ -239,14 +239,14 @@ int main(void)
           // res.set_header("Set-Cookie", std::string("") + "session_id=" + newUUID + "; Path=/; HttpOnly; Secure");
           Sqlite::sqliteExecute(connection, "insert into sessions(username, sessionid) values (?, ?)", userName, newUUIDHash);
           std::cout << "Login success" << std::endl;
-          res.set_content(successJSON.dump(), "text/json");
+          res.set_content(successJSON.dump(), "application/json");
           return;
         }
       }
     }
 
     std::cout << "Login failed" << std::endl;
-    res.set_content("{\"status\":\"failed\"}", "text/json"); });
+    res.set_content("{\"status\":\"failed\"}", "application/json"); });
 
   svr.listen("localhost", 1234);
 }
