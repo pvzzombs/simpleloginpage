@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 function Form(props) {
 
-    props.styles.form = {
+    const formStyle = {
         ...props.styles.form,
         display: "flex",
         flexDirection: "column",
@@ -17,7 +17,7 @@ function Form(props) {
     }
 
     return (
-        <div style={props.styles.form}>
+        <div style={formStyle}>
             {props.title === null ? null : <p>{props.title}</p>}
             {props.fields.map((field) => {
                 return (
@@ -65,6 +65,7 @@ Form.defaultProps = {
             fontFamily: "Inter, Consolas"
         },
         inputBoxStyle: {
+            height: "20px",
             borderStyle: "solid",
             borderColor: "black",
             borderWidth: "1px",
