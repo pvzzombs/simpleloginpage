@@ -116,17 +116,18 @@ function Home() {
       });
   }
   return (
-    <div>
-      <div>
-        <h1 id="banner"> Hello {username}! </h1>
-        <input type="button" value="Logout" id="logout" onClick={tryLogout} />
+    <div className="tw-h-screen tw-grid tw-place-items-center">
+      <div className="tw-text-center">
+        <h2 className="tw-text-2xl tw-font-bold" id="banner"> Hello {username}! </h2>
+        <input className="tw-d-btn tw-m-1" type="button" value="Logout" id="logout" onClick={tryLogout} />
         <input
+          className="tw-d-btn tw-m-1"
           type="button"
           value="Delete all"
           id="delete"
           onClick={tryDelete}
         />
-        <input type="button" value="Insert" id="insert" onClick={tryInsert} />
+        <input className="tw-d-btn tw-m-1" type="button" value="Insert" id="insert" onClick={tryInsert} />
         <div id="list"></div>
         <ul>
           {items.map((item, index) => {

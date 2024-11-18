@@ -48,22 +48,22 @@ function Login() {
       });
   }
   return (
-    <div>
-      <div className="container">
-        <h2>Login</h2>
+    <div className="tw-h-screen tw-grid tw-place-items-center">
+    <div className="tw-d-card tw-d-card-bordered tw-bg-base-100 tw-w-96 tw-shadow-xl">
+      <div className="tw-d-card-body tw-text-center">
+        <h2 className="tw-text-2xl tw-font-bold">Login</h2>
         <form id="loginForm" onSubmit={tryLogin}>
-          <div className="input-group">
-            <label htmlFor="username">Username</label>
-            <input type="text" id="username" name="username" required />
+          <div className="">
+            <input placeholder="Username" className="tw-d-input tw-d-input-bordered tw-w-full tw-m-1" type="text" id="username" name="username" required />
           </div>
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <input type="password" id="password" name="password" required />
+          <div className="">
+            <input placeholder="Password" className="tw-d-input tw-d-input-bordered tw-w-full tw-m-1" type="password" id="password" name="password" required />
           </div>
-          <button type="submit">Login</button>
+          <button className="tw-d-btn tw-m-1" type="submit">Login</button>
         </form>
         <a href="./register"> Register here </a>
       </div>
+    </div>
     </div>
   );
 }

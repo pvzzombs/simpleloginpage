@@ -52,29 +52,30 @@ function Register() {
       });
   }
   return (
-    <div className="container">
-      <h2>Register</h2>
-      <form id="registrationForm" onSubmit={tryRegister}>
-        <div className="input-group">
-          <label htmlFor="username">Username</label>
-          <input type="text" id="username" name="username" required />
+    <div className="tw-h-screen tw-grid tw-place-items-center">
+    <div className="tw-d-card tw-d-card-bordered tw-bg-base-100 tw-w-96 tw-shadow-xl tw-text-center">
+      <form className="tw-d-card-body tw-text-center" id="registrationForm" onSubmit={tryRegister}>
+      <h2 className="tw-text-2xl tw-font-bold">Register</h2>
+        <div className="">
+          <input placeholder="Username" className="tw-d-input tw-d-input-bordered tw-w-full tw-m-1" type="text" id="username" name="username" required />
         </div>
-        <div className="input-group">
-          <label htmlFor="password">Password</label>
-          <input type="password" id="password" name="password" required />
+        <div className="">
+          <input placeholder="Password" className="tw-d-input tw-d-input-bordered tw-w-full tw-m-1" type="password" id="password" name="password" required />
         </div>
-        <div className="input-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
+        <div className="">
           <input
+            placeholder="Confirm Password"
+            className="tw-d-input tw-d-input-bordered tw-w-full tw-m-1"
             type="password"
             id="confirmPassword"
             name="confirmPassword"
             required
           />
         </div>
-        <button type="submit">Register</button>
+        <button className="tw-d-btn" type="submit">Register</button>
+        <a href="./"> Login here </a>
       </form>
-      <a href="./"> Login here </a>
+    </div>
     </div>
   );
 }
