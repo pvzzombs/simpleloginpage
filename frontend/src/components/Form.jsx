@@ -19,9 +19,9 @@ function Form(props) {
     return (
         <div style={formStyle}>
             {props.title === null ? null : <p>{props.title}</p>}
-            {props.fields.map((field) => {
+            {props.fields.map((field, index) => {
                 return (
-                    <div style={inputStyle}>
+                    <div key={index} style={inputStyle}>
                         <p style={props.styles.inputTextStyle}>{field.label}</p>
                         <input id={field.id} type={field.type} style={props.styles.inputBoxStyle}></input>
                     </div>
