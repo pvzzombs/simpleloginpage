@@ -6,7 +6,7 @@ function Login() {
   let navigate = useNavigate();
 
   useEffect(function() {
-    if (localStorage.getItem("sessionid") != null) {
+    if (localStorage.getItem("sessionid") != null && localStorage.getItem("username") !== null) {
       // window.location.replace("./home");
       navigate("/home", { replace: true });
       // return (

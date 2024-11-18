@@ -6,8 +6,11 @@ function Home() {
   const [items, setItems] = useState([]);
   let navigate = useNavigate();
 
+  const username = localStorage.getItem("username");
+  const sessionid = localStorage.getItem("sessionid");
+
   useEffect(function() {
-    if (localStorage.getItem("sessionid") === null) {
+    if (username === null || sessionid === null) {
       // window.location.replace("/");
       // return (
       //   <Navigate to="/" replace/>
@@ -15,9 +18,6 @@ function Home() {
       navigate("/", { replace: true });
     }
   }, []);
-
-  const username = localStorage.getItem("username");
-  const sessionid = localStorage.getItem("sessionid");
 
   useEffect(function () {
     axios
