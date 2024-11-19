@@ -1,4 +1,5 @@
 import axios from "axios";
+import uuid4 from "uuid4"
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -74,8 +75,70 @@ function Home() {
         if (status === "failed") {
           alert("Unable to delete todo list");
         } else {
-          alert("Deleting todo list success");
+          // alert("Deleting todo list success");
           setItems([]);
+        }
+      });
+  }
+
+  function tryDeleteOnce(event, todoID) {
+    event.preventDefault();
+    axios
+      .post("http://localhost:1234/list/deleteOne", {
+        username,
+        sessionid,
+        id: todoID
+      })
+      .then(function (response) {
+        var status = response.data.status;
+        if (status === "failed") {
+          alert("Unable to delete todo list");
+        } else {
+          // alert("Deleting a single todo list success");
+          axios
+            .get("http://localhost:1234/list", {
+              params: {
+                username,
+                sessionid,
+              },
+            })
+            .then(function (response) {
+              // alert();
+              // console.log(response.data.data);
+              let newList = response.data.data.list ?? [];
+              // console.log(newList);
+              setItems([...newList]);
+              console.log(items);
+            });
+        }
+      });
+  }
+
+  function tryUpdate(todoID) {
+    let todoIsDone = document.getElementById(todoID).checked;
+    axios
+      .post("http://localhost:1234/list/update", {
+        username,
+        sessionid,
+        id: todoID,
+        isDone: todoIsDone ? "True" : "False"
+      })
+      .then(function (response) {
+        var status = response.data.status;
+        if (status === "failed") {
+          alert("Unable to delete todo list");
+        } else {
+          // alert("Update todo list success");
+          // document.getElementById(todoID).checked = !document.getElementById(todoID).checked;
+          let newItems = items;
+          for (let i = 0; i < items.length; i++) {
+            if (newItems[i].id === todoID) {
+              newItems[i].isDone = todoIsDone ? "True" : "False";
+              break;
+            }
+          }
+          setItems([...newItems]);
+          // console.table(items);
         }
       });
   }
@@ -91,6 +154,8 @@ function Home() {
         username,
         sessionid,
         item,
+        id: uuid4(),
+        isDone: "False"
       })
       .then(function (response) {
         var status = response.data.status;
@@ -110,7 +175,7 @@ function Home() {
               let newList = response.data.data.list ?? [];
               // console.log(newList);
               setItems([...newList]);
-              console.log(items);
+              // console.log(items);
             });
         }
       });
@@ -131,7 +196,7 @@ function Home() {
         <div id="list"></div>
         <ul>
           {items.map((item, index) => {
-            return <li key={index}>{item}</li>;
+            return <li key={index}> <input className="tw-d-checkbox" type="checkbox" checked={item.isDone === "True" ? true : false} id={item.id} onChange={() => { tryUpdate(item.id) }}/> {item.item} <input className="tw-d-btn" type="button" value="Delete" onClick={(event) => { tryDeleteOnce(event, item.id) }}/> </li>;
           })}
         </ul>
       </div>

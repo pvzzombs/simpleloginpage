@@ -1441,7 +1441,7 @@ fraction.js@^4.3.7:
   version "0.0.0"
   dependencies:
     axios "^1.7.7"
-    frontend "file:../../../../AppData/Local/Yarn/Cache/v6/npm-frontend-0.0.0-246752cf-cc64-454d-9574-60b78c29e899-1731904662589/node_modules/frontend"
+    frontend "file:../../../../AppData/Local/Yarn/Cache/v6/npm-frontend-0.0.0-789e1f4b-15c9-4bcd-a26b-61d7a09a41f2-1731995142510/node_modules/frontend"
     react "^18.3.1"
     react-dom "^18.3.1"
     react-router-dom "^6.28.0"
@@ -2739,6 +2739,11 @@ util-deprecate@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
+
+uuid4@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/uuid4/-/uuid4-2.0.3.tgz#241e5dfe1704a79c52e2aa40e7e581a5e7b01ab4"
+  integrity sha512-CTpAkEVXMNJl2ojgtpLXHgz23dh8z81u6/HEPiQFOvBc/c2pde6TVHmH4uwY0d/GLF3tb7+VDAj4+2eJaQSdZQ==
 
 vite@^5.4.10:
   version "5.4.11"

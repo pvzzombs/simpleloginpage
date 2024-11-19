@@ -109,6 +109,47 @@ int main(void)
     res.set_content("{\"status\":\"failed\"}", "application/json");
   });
 
+  svr.Options("/list/deleteOne", [&](const Request &req, Response &res){
+    allowCORS(res);
+  });
+  svr.Post("/list/deleteOne", [&](const Request &req, Response &res){
+    allowCORS(res);
+    nlohmann::json j = nlohmann::json::parse(req.body);
+    std::string userName = j["username"];
+    std::string sessionID = j["sessionid"];
+    std::string todoID = j["id"];
+
+    for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
+      if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
+        Sqlite::sqliteExecute(connection, "delete from todo where username = ? and id = ?", userName, todoID);
+        res.set_content("{\"status\":\"success\"}", "application/json");
+        return;
+      }
+    }
+    res.set_content("{\"status\":\"failed\"}", "application/json");
+  });
+
+  svr.Options("/list/update", [&](const Request &req, Response &res){
+    allowCORS(res);
+  });
+  svr.Post("/list/update", [&](const Request &req, Response &res){
+    allowCORS(res);
+    nlohmann::json j = nlohmann::json::parse(req.body);
+    std::string userName = j["username"];
+    std::string sessionID = j["sessionid"];
+    std::string todoID = j["id"];
+    std::string todoIsDone = j["isDone"];
+
+    for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
+      if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
+        Sqlite::sqliteExecute(connection, "update todo set isDone = ? where id = ? and username = ?", todoIsDone, todoID, userName);
+        res.set_content("{\"status\":\"success\"}", "application/json");
+        return;
+      }
+    }
+    res.set_content("{\"status\":\"failed\"}", "application/json");
+  });
+
   svr.Options("/list/insert", [&](const Request &req, Response &res){
     allowCORS(res);
   });
@@ -118,10 +159,12 @@ int main(void)
     std::string userName = j["username"];
     std::string sessionID = j["sessionid"];
     std::string todoItem = j["item"];
+    std::string todoID = j["id"];
+    std::string todoIsDone = j["isDone"];
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
-        Sqlite::sqliteExecute(connection, "insert into todo(username, item) values(?, ?)", userName, todoItem);
+        Sqlite::sqliteExecute(connection, "insert into todo(username, item, id, isDone) values(?, ?, ?, ?)", userName, todoItem, todoID, todoIsDone);
         res.set_content("{\"status\":\"success\"}", "application/json");
         return;
       }
@@ -142,8 +185,12 @@ int main(void)
         if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
           nlohmann::json j;
           j["list"] = {};
-          for (auto item: Sqlite::SqliteStatement(connection, "select username, item from todo where username = ?", userName)) {
-            j["list"].push_back(item.getString(1));
+          for (auto item: Sqlite::SqliteStatement(connection, "select username, item, id, isDone from todo where username = ?", userName)) {
+            nlohmann::json toDoItem;
+            toDoItem["item"] = item.getString(1);
+            toDoItem["id"] = item.getString(2);
+            toDoItem["isDone"] = item.getString(3);
+            j["list"].push_back(toDoItem);
           }
           res.set_content("{\"status\":\"success\", \"data\":" + j.dump() + "}", "application/json");
           return;
