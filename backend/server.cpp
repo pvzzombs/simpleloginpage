@@ -137,12 +137,13 @@ int main(void)
     nlohmann::json j = nlohmann::json::parse(req.body);
     std::string userName = j["username"];
     std::string sessionID = j["sessionid"];
+    std::string todoItem = j["item"];
     std::string todoID = j["id"];
     std::string todoIsDone = j["isDone"];
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
-        Sqlite::sqliteExecute(connection, "update todo set isDone = ? where id = ? and username = ?", todoIsDone, todoID, userName);
+        Sqlite::sqliteExecute(connection, "update todo set item = ?, isDone = ? where id = ? and username = ?", todoItem, todoIsDone, todoID, userName);
         res.set_content("{\"status\":\"success\"}", "application/json");
         return;
       }

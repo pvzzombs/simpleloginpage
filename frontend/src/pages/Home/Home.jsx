@@ -36,7 +36,7 @@ function Home() {
         let newList = response.data.data.list ?? [];
         // console.log(newList);
         setItems([...newList]);
-        console.log(items);
+        // console.log(items);
       });
   }, []);
 
@@ -114,13 +114,22 @@ function Home() {
       });
   }
 
-  function tryUpdate(todoID) {
+  function tryChange(todoID, todoItem) {
+    var item = prompt("Change value:", todoItem);
+    if (item === "") {
+      return;
+    }
+    tryUpdate(todoID, item);
+  }
+
+  function tryUpdate(todoID, todoItem) {
     const todoIsDone = document.getElementById(todoID).checked;
     axios
       .post(baseURL + "/list/update", {
         username,
         sessionid,
         id: todoID,
+        item: todoItem,
         isDone: todoIsDone ? "True" : "False"
       })
       .then(function (response) {
@@ -133,6 +142,7 @@ function Home() {
           for (let i = 0; i < items.length; i++) {
             if (newItems[i].id === todoID) {
               newItems[i].isDone = todoIsDone ? "True" : "False";
+              newItems[i].item = todoItem;
               break;
             }
           }
@@ -193,7 +203,10 @@ function Home() {
         <input className="tw-d-btn tw-m-1" type="button" value="Insert" id="insert" onClick={tryInsert} />
         <ul>
           {items.map((item, index) => {
-            return <li key={index}> <input className="tw-d-checkbox" type="checkbox" checked={item.isDone === "True" ? true : false} id={item.id} onChange={() => { tryUpdate(item.id) }}/> {item.item} <input className="tw-d-btn" type="button" value="Delete" onClick={(event) => { tryDeleteOnce(event, item.id) }}/> </li>;
+            return (<li key={index}> <input className="tw-d-checkbox" type="checkbox" checked={item.isDone === "True" ? true : false} id={item.id} onChange={() => { tryUpdate(item.id, item.item) }}/>
+            {item.item}
+            <input className="tw-d-btn tw-m-1" type="button" value="Edit" onClick={() => { tryChange(item.id, item.item) }}/>
+            <input className="tw-d-btn tw-m-1" type="button" value="Delete" onClick={(event) => { tryDeleteOnce(event, item.id) }}/> </li>);
           })}
         </ul>
       </div>
