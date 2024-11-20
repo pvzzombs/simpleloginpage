@@ -40,8 +40,7 @@ function Home() {
       });
   }, []);
 
-  function tryLogout(event) {
-    event.preventDefault();
+  function tryLogout() {
     axios
       .post(baseURL + "/logout", {
         username,
@@ -65,8 +64,7 @@ function Home() {
       });
   }
 
-  function tryDelete(event) {
-    event.preventDefault();
+  function tryDelete() {
     axios
       .post(baseURL + "/list/delete", {
         username,
@@ -84,7 +82,7 @@ function Home() {
   }
 
   function tryDeleteOnce(event, todoID) {
-    event.preventDefault();
+    // event.preventDefault();
     axios
       .post(baseURL + "/list/deleteOne", {
         username,
@@ -144,8 +142,7 @@ function Home() {
       });
   }
 
-  function tryInsert(event) {
-    event.preventDefault();
+  function tryInsert() {
     var item = prompt("Insert value:");
     if (item === "") {
       return;
@@ -194,7 +191,6 @@ function Home() {
           onClick={tryDelete}
         />
         <input className="tw-d-btn tw-m-1" type="button" value="Insert" id="insert" onClick={tryInsert} />
-        <div id="list"></div>
         <ul>
           {items.map((item, index) => {
             return <li key={index}> <input className="tw-d-checkbox" type="checkbox" checked={item.isDone === "True" ? true : false} id={item.id} onChange={() => { tryUpdate(item.id) }}/> {item.item} <input className="tw-d-btn" type="button" value="Delete" onClick={(event) => { tryDeleteOnce(event, item.id) }}/> </li>;
