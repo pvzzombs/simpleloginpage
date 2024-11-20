@@ -1,4 +1,5 @@
 import axios from "axios";
+import baseURL from "../../BaseURL";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -27,7 +28,7 @@ function Login() {
     }
 
     axios
-      .post("http://localhost:1234/login", {
+      .post(baseURL + "/login", {
         username,
         password,
       })

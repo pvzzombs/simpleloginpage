@@ -1,5 +1,7 @@
 import axios from "axios";
 import uuid4 from "uuid4"
+import deepClone from "deep-clone"
+import baseURL from "../../BaseURL.jsx"
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -22,7 +24,7 @@ function Home() {
 
   useEffect(function () {
     axios
-      .get("http://localhost:1234/list", {
+      .get(baseURL + "/list", {
         params: {
           username,
           sessionid,
@@ -41,7 +43,7 @@ function Home() {
   function tryLogout(event) {
     event.preventDefault();
     axios
-      .post("http://localhost:1234/logout", {
+      .post(baseURL + "/logout", {
         username,
         sessionid,
       })
@@ -66,7 +68,7 @@ function Home() {
   function tryDelete(event) {
     event.preventDefault();
     axios
-      .post("http://localhost:1234/list/delete", {
+      .post(baseURL + "/list/delete", {
         username,
         sessionid,
       })
@@ -84,7 +86,7 @@ function Home() {
   function tryDeleteOnce(event, todoID) {
     event.preventDefault();
     axios
-      .post("http://localhost:1234/list/deleteOne", {
+      .post(baseURL + "/list/deleteOne", {
         username,
         sessionid,
         id: todoID
@@ -96,7 +98,7 @@ function Home() {
         } else {
           // alert("Deleting a single todo list success");
           axios
-            .get("http://localhost:1234/list", {
+            .get(baseURL + "/list", {
               params: {
                 username,
                 sessionid,
@@ -115,9 +117,9 @@ function Home() {
   }
 
   function tryUpdate(todoID) {
-    let todoIsDone = document.getElementById(todoID).checked;
+    const todoIsDone = document.getElementById(todoID).checked;
     axios
-      .post("http://localhost:1234/list/update", {
+      .post(baseURL + "/list/update", {
         username,
         sessionid,
         id: todoID,
@@ -129,8 +131,7 @@ function Home() {
           alert("Unable to delete todo list");
         } else {
           // alert("Update todo list success");
-          // document.getElementById(todoID).checked = !document.getElementById(todoID).checked;
-          let newItems = items;
+          let newItems = deepClone(items);
           for (let i = 0; i < items.length; i++) {
             if (newItems[i].id === todoID) {
               newItems[i].isDone = todoIsDone ? "True" : "False";
@@ -150,7 +151,7 @@ function Home() {
       return;
     }
     axios
-      .post("http://localhost:1234/list/insert", {
+      .post(baseURL + "/list/insert", {
         username,
         sessionid,
         item,
@@ -163,7 +164,7 @@ function Home() {
           alert("Unable to insert!");
         } else {
           axios
-            .get("http://localhost:1234/list", {
+            .get(baseURL + "/list", {
               params: {
                 username,
                 sessionid,

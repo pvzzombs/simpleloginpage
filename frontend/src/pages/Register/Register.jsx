@@ -1,4 +1,5 @@
 import axios from "axios";
+import baseURL from "../../BaseURL";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -33,7 +34,7 @@ function Register() {
     }
 
     axios
-      .post("http://localhost:1234/register", {
+      .post(baseURL + "/register", {
         username,
         password,
       })
