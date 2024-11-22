@@ -14,10 +14,6 @@ function Home() {
 
   useEffect(function() {
     if (username === null || sessionid === null) {
-      // window.location.replace("/");
-      // return (
-      //   <Navigate to="/" replace/>
-      // )
       navigate("/", { replace: true });
     }
   }, []);
@@ -51,14 +47,8 @@ function Home() {
         if (status === "failed") {
           alert("Unable to logout!");
         } else {
-          // eraseCookie("username");
-          // eraseCookie("sessionid");
           localStorage.removeItem("username");
           localStorage.removeItem("sessionid");
-          // window.location.replace("/");
-          // return (
-          //   <Navigate to="/" replace/>
-          // )
           navigate("/", { replace: true });
         }
       });
@@ -94,22 +84,15 @@ function Home() {
         if (status === "failed") {
           alert("Unable to delete todo list");
         } else {
-          // alert("Deleting a single todo list success");
-          axios
-            .get(baseURL + "/list", {
-              params: {
-                username,
-                sessionid,
-              },
-            })
-            .then(function (response) {
-              // alert();
-              // console.log(response.data.data);
-              let newList = response.data.data.list ?? [];
-              // console.log(newList);
-              setItems([...newList]);
-              console.log(items);
-            });
+          let newItems = deepClone(items);
+          let indexToBeRemoved = -1;
+          for (let i = 0; i < newItems.length; i++) {
+            if (newItems[i].id === todoID) {
+              indexToBeRemoved = i;
+            }
+          }
+          newItems.splice(indexToBeRemoved, 1);
+          setItems([...newItems]);
         }
       });
   }
@@ -139,7 +122,7 @@ function Home() {
         } else {
           // alert("Update todo list success");
           let newItems = deepClone(items);
-          for (let i = 0; i < items.length; i++) {
+          for (let i = 0; i < newItems.length; i++) {
             if (newItems[i].id === todoID) {
               newItems[i].isDone = todoIsDone ? "True" : "False";
               newItems[i].item = todoItem;
@@ -154,6 +137,8 @@ function Home() {
 
   function tryInsert() {
     var item = prompt("Insert value:");
+    var id = uuid4();
+    var isDone = "False";
     if (item === "") {
       return;
     }
@@ -162,29 +147,21 @@ function Home() {
         username,
         sessionid,
         item,
-        id: uuid4(),
-        isDone: "False"
+        id,
+        isDone
       })
       .then(function (response) {
         var status = response.data.status;
         if (status === "failed") {
           alert("Unable to insert!");
         } else {
-          axios
-            .get(baseURL + "/list", {
-              params: {
-                username,
-                sessionid,
-              },
-            })
-            .then(function (response) {
-              // alert();
-              // console.log(response.data.data);
-              let newList = response.data.data.list ?? [];
-              // console.log(newList);
-              setItems([...newList]);
-              // console.log(items);
-            });
+          let newItems = deepClone(items);
+          newItems.push({
+            item,
+            id,
+            isDone
+          });
+          setItems([...newItems]);
         }
       });
   }
