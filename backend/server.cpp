@@ -176,7 +176,31 @@ int main(void)
   svr.Options("/list", [&](const Request &req, Response &res){
     allowCORS(res);
   });
-  svr.Get("/list", [&](const Request &req, Response &res){
+  svr.Post("/list", [&](const Request &req, Response &res){
+    allowCORS(res);
+    nlohmann::json j = nlohmann::json::parse(req.body);
+    std::string userName = j["username"];
+    std::string sessionID = j["sessionid"];
+
+    for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
+      if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
+        nlohmann::json j;
+        j["list"] = {};
+        for (auto item: Sqlite::SqliteStatement(connection, "select username, item, id, isDone from todo where username = ?", userName)) {
+          nlohmann::json toDoItem;
+          toDoItem["item"] = item.getString(1);
+          toDoItem["id"] = item.getString(2);
+          toDoItem["isDone"] = item.getString(3);
+          j["list"].push_back(toDoItem);
+        }
+        res.set_content("{\"status\":\"success\", \"data\":" + j.dump() + "}", "application/json");
+        return;
+      }
+    }
+    res.set_content("{\"status\":\"failed\"}", "application/json");
+  });
+
+  /*svr.Get("/list", [&](const Request &req, Response &res){
     allowCORS(res);
     if (req.has_param("username") && req.has_param("sessionid")) {
       std::string userName = req.get_param_value("username");
@@ -199,7 +223,7 @@ int main(void)
       }
     }
     res.set_content("{\"status\":\"failed\"}", "application/json");
-  });
+  });*/
 
   svr.Options("/logout", [&](const Request &req, Response &res){
     allowCORS(res);

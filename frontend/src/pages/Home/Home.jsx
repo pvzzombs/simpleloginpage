@@ -20,11 +20,9 @@ function Home() {
 
   useEffect(function () {
     axios
-      .get(baseURL + "/list", {
-        params: {
-          username,
-          sessionid,
-        },
+      .post(baseURL + "/list", {
+        username,
+        sessionid,
       })
       .then(function (response) {
         // alert();
