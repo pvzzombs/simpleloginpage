@@ -98,6 +98,10 @@ int main(void)
     nlohmann::json j = nlohmann::json::parse(req.body);
     std::string userName = j["username"];
     std::string sessionID = j["sessionid"];
+    if (userName == "" || sessionID == "") {
+      res.set_content("{\"status\":\"failed\"}", "application/json");
+      return;
+    }
     
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
@@ -118,6 +122,10 @@ int main(void)
     std::string userName = j["username"];
     std::string sessionID = j["sessionid"];
     std::string todoID = j["id"];
+    if (userName == "" || sessionID == "" || todoID == "") {
+      res.set_content("{\"status\":\"failed\"}", "application/json");
+      return;
+    }
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
@@ -140,6 +148,10 @@ int main(void)
     std::string todoItem = j["item"];
     std::string todoID = j["id"];
     std::string todoIsDone = j["isDone"];
+    if (userName == "" || sessionID == "" || todoItem == "" || todoID == "" || todoIsDone == "") {
+      res.set_content("{\"status\":\"failed\"}", "application/json");
+      return;
+    }
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
@@ -162,6 +174,10 @@ int main(void)
     std::string todoItem = j["item"];
     std::string todoID = j["id"];
     std::string todoIsDone = j["isDone"];
+    if (userName == "" || sessionID == "" || todoItem == "" || todoID == "" || todoIsDone == "") {
+      res.set_content("{\"status\":\"failed\"}", "application/json");
+      return;
+    }
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
@@ -181,6 +197,10 @@ int main(void)
     nlohmann::json j = nlohmann::json::parse(req.body);
     std::string userName = j["username"];
     std::string sessionID = j["sessionid"];
+    if (userName == "" || sessionID == "") {
+      res.set_content("{\"status\":\"failed\"}", "application/json");
+      return;
+    }
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(sessionID, row.getString(1))) {
@@ -234,6 +254,10 @@ int main(void)
     nlohmann::json j = nlohmann::json::parse(req.body);
     std::string userName = j["username"];
     std::string userSessionID = j["sessionid"];
+    if (userName == "" || userSessionID == "") {
+      res.set_content("{\"status\":\"failed\"}", "application/json");
+      return;
+    }
 
     for (auto row: Sqlite::SqliteStatement(connection, "select username, sessionid from sessions where username = ?", userName)) {
       if (row.getString(0) == userName && verify_password(userSessionID, row.getString(1))) {
@@ -256,6 +280,10 @@ int main(void)
     std::string userName = j["username"];
     std::string passWord = j["password"];
     std::string passWordHash = hash_password(passWord);
+    if (userName == "" || passWord == "") {
+      res.set_content("{\"status\":\"failed\"}", "application/json");
+      return;
+    }
 
     // for (size_t i = 0; i < users.size(); i++) {
     //   if (users.at(i).username == newUser.username) {
@@ -288,6 +316,10 @@ int main(void)
     nlohmann::json j = nlohmann::json::parse(req.body);
     std::string userName = j["username"];
     std::string passWord = j["password"];
+    if (userName == "" || passWord == "") {
+      res.set_content("{\"status\":\"failed\"}", "application/json");
+      return;
+    }
 
     // if already logged in
     for (auto row: Sqlite::SqliteStatement(connection, "select username from sessions where username = ?", userName)) {
