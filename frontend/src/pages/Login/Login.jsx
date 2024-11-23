@@ -1,13 +1,17 @@
 import axios from "axios";
 import baseURL from "../../BaseURL";
+import Form from "../../components/Form";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
   let navigate = useNavigate();
 
-  useEffect(function() {
-    if (localStorage.getItem("sessionid") != null && localStorage.getItem("username") !== null) {
+  useEffect(function () {
+    if (
+      localStorage.getItem("sessionid") != null &&
+      localStorage.getItem("username") !== null
+    ) {
       // window.location.replace("./home");
       navigate("/home", { replace: true });
       // return (
@@ -48,24 +52,89 @@ function Login() {
         }
       });
   }
+
+  function handleLogin(values) {
+    // Get the form data
+    const username = values.user;
+    const password = values.pw;
+    console.table(values);
+
+    if (username == "" || password == "") {
+      alert("Please kindly fill up the required fields.");
+      return;
+    }
+
+    axios
+      .post(baseURL + "/login", {
+        username,
+        password,
+      })
+      .then(function (response) {
+        var status = response.data.status;
+        if (status === "failed") {
+          alert("Login Unsuccessful!");
+        } else {
+          const sessionid = response.data.sessionid;
+          // setCookie("username", username, 1);
+          // setCookie("sessionid", sessionid, 1);
+          localStorage.setItem("username", username);
+          localStorage.setItem("sessionid", sessionid);
+          //  window.location.replace("/home");
+          // alert("Success");
+          navigate("/home", { replace: true });
+        }
+      });
+  }
+
+  const styles = {
+    form: {
+      boxShadow: "0px 5px 10px 1px lightgray",
+      borderWidth: "1px",
+      borderColor: "lightgray",
+      borderRadius: "10px",
+      width: "300px",
+    },
+    title: {
+      fontWeight: "bold",
+      fontSize: "20px",
+      marginBottom: "10px",
+    },
+    inputBox: {
+      height: "30px",
+      width: "94%",
+      borderColor: "lightgray",
+      borderWidth: "1px",
+      paddingLeft: "10px",
+    },
+    submitButton: {
+      height: "30px",
+      backgroundColor: "#dedede",
+      borderWidth: "0px",
+    },
+  };
+
+  const fields = [
+    {
+      id: "user",
+      placeholder: "Username",
+      type: "text",
+    },
+    {
+      id: "pw",
+      placeholder: "Password",
+      type: "password",
+      showPasswordText: "Show Password",
+    },
+  ];
+
   return (
-    <div className="tw-h-screen tw-grid tw-place-items-center">
-    <div className="tw-d-card tw-d-card-bordered tw-bg-base-100 tw-w-96 tw-shadow-xl">
-      <div className="tw-d-card-body tw-text-center">
-        <h2 className="tw-text-2xl tw-font-bold">Login</h2>
-        <form id="loginForm" onSubmit={tryLogin}>
-          <div className="">
-            <input placeholder="Username" className="tw-d-input tw-d-input-bordered tw-w-full tw-m-1" type="text" id="username" name="username" required />
-          </div>
-          <div className="">
-            <input placeholder="Password" className="tw-d-input tw-d-input-bordered tw-w-full tw-m-1" type="password" id="password" name="password" required />
-          </div>
-          <button className="tw-d-btn tw-m-1" type="submit">Login</button>
-        </form>
-        <a href="./register"> Register here </a>
-      </div>
-    </div>
-    </div>
+    <Form
+      title={"Login"}
+      fields={fields}
+      submitButton={{ label: "Submit", onClick: handleLogin }}
+      styles={styles}
+      extra="<p>Not registered yet? Register <a href='/register'>here.</a></p>"
+    />
   );
 }
 
