@@ -16,6 +16,10 @@ class RegisterDetails(BaseModel):
   username: str
   password: str
 
+class LogoutDetails(BaseModel):
+  username: str
+  sessionid: str
+
 class Users(SQLModel, table=True):
   username: str = Field(primary_key=True)
   password: str
@@ -32,12 +36,6 @@ engine = create_engine(sqliteURL)
 def createDBAndTables():
   SQLModel.metadata.create_all(engine)
 
-# def getSession():
-#   with Session(engine) as session:
-#     yield session
-
-# SessionDep = Annotated[Session, Depends(getSession)]
-
 app = FastAPI()
 
 @app.on_event("startup")
@@ -47,6 +45,25 @@ def onStartUp():
 # @app.get("/")
 # def root():
 #   return {"message": nacl.pwhash.str(b"Hello World")}
+
+@app.post("/logout")
+def logout(l: LogoutDetails):
+  if l.username == "" or l.sessionid == "":
+    return { "status": "failed" }
+  with Session(engine) as session:
+    statement = select(Sessions).where(Sessions.username == l.username)
+    results = session.exec(statement)
+    for r in results:
+      isMatch = False
+      try:
+        isMatch = nacl.pwhash.verify(r.sessionid.encode(), l.sessionid.encode())
+      except:
+        isMatch = False
+      if isMatch:
+        session.delete(r)
+        session.commit()
+        return { "status": "success" }
+  return { "status": "failed" }
 
 @app.post("/register")
 def register(r: RegisterDetails):
@@ -59,8 +76,7 @@ def register(r: RegisterDetails):
     results = session.exec(statement)
     for u in results:
       return { "status": "failed", "message": "Username already exists" }
-  passwordHash = nacl.pwhash.str(r.password.encode()).decode()
-  with Session(engine) as session:
+    passwordHash = nacl.pwhash.str(r.password.encode()).decode()
     session.add(Users(username=r.username, password=passwordHash))
     session.commit()
   return { "status": "success" }
@@ -69,7 +85,6 @@ def register(r: RegisterDetails):
 def login(l: LoginDetails):
   if l.username == "" or l.password == "":
     return { "status": "failed" }
-  logging.debug("Here---")
   with Session(engine) as session:
     statement = select(Sessions).where(Sessions.username == l.username)
     results = session.exec(statement)
@@ -79,17 +94,14 @@ def login(l: LoginDetails):
     results = session.exec(statement)
     isMatch = False
     for u in results:
-      logging.debug("User exists---")
-      logging.debug(u.password)
       try:
         isMatch = nacl.pwhash.verify(u.password.encode(), l.password.encode())
       except:
-        logging.debug("Did not match passwords")
         isMatch = False
       if isMatch:
         newUUID = str(uuid.uuid4())
-        newUUIDHash = nacl.pwhash.str(newUUID.encode())
+        newUUIDHash = nacl.pwhash.str(newUUID.encode()).decode()
         session.add(Sessions(username=l.username, sessionid=newUUIDHash))
         session.commit()
-        return { "status": "success", "sessionid": newUUIDHash }
+        return { "status": "success", "sessionid": newUUID }
   return { "status": "failed", "message": "Cannot login" }
