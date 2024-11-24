@@ -143,7 +143,8 @@ function Register() {
     <Form
       title={"Register"}
       fields={fields}
-      submitButton={{ label: "Submit", onClick: handleRegister }}
+      submitButton={{ label: "Submit" }}
+      formSubmit={{ callback: handleRegister}}
       styles={styles}
       extra="<p>Already have account? Login <a href='/'>here.</a></p>"
     />

@@ -124,7 +124,7 @@ function Form(props) {
 
   const inputRefs = {};
 
-  const handleSubmit = () => {
+  function handleSubmitForm() {
     const inputValues = {};
     props.fields.forEach((field) => {
       const input = inputRefs[field.id];
@@ -133,11 +133,11 @@ function Form(props) {
       }
     });
 
-    props.submitButton.onClick(inputValues);
-  };
+    props.formSubmit.callback(inputValues);
+  } 
 
   return (
-    <div style={formStyle}>
+    <form style={formStyle} onSubmit={(event) => {event.preventDefault(); handleSubmitForm()}}>
       {props.title !== null && <p style={props.styles.title}>{props.title}</p>}
       <div style={inputContainerStyle}>
         {props.fields.map((field) =>
@@ -173,7 +173,6 @@ function Form(props) {
         <input
           type="submit"
           value={props.submitButton.label}
-          onClick={(event) => {event.preventDefault(); handleSubmit()}}
           style={submitButtonStyle}
         />
       </div>
@@ -181,7 +180,7 @@ function Form(props) {
         dangerouslySetInnerHTML={{ __html: props.extra }}
         style={extraStyle}
       />
-    </div>
+    </form>
   );
 }
 
@@ -190,6 +189,7 @@ Form.propTypes = {
   fields: PropTypes.array,
   submitButton: PropTypes.object,
   styles: PropTypes.object,
+  formSubmit: PropTypes.object
 };
 
 Form.defaultProps = {
@@ -211,7 +211,6 @@ Form.defaultProps = {
   ],
   submitButton: {
     label: "Submit",
-    onClick: null,
   },
   extra: "<p>Not registered yet? Register <a href=''>here.</a></p>",
   styles: {
@@ -225,6 +224,9 @@ Form.defaultProps = {
     submitButton: {},
     extra: {},
   },
+  formSubmit: {
+    callback: null
+  }
 };
 
 export default Form;

@@ -57,7 +57,7 @@ function Login() {
     // Get the form data
     const username = values.user;
     const password = values.pw;
-    console.table(values);
+    // console.table(values);
 
     if (username == "" || password == "") {
       alert("Please kindly fill up the required fields.");
@@ -131,7 +131,8 @@ function Login() {
     <Form
       title={"Login"}
       fields={fields}
-      submitButton={{ label: "Submit", onClick: handleLogin }}
+      submitButton={{ label: "Submit" }}
+      formSubmit={{ callback: handleLogin}}
       styles={styles}
       extra="<p>Not registered yet? Register <a href='/register'>here.</a></p>"
     />
