@@ -95,7 +95,8 @@ def deleteAllList(l: ListDeleteAll):
   with Session(engine) as session:
     statement = select(Sessions).where(Sessions.username == l.username)
     results = session.exec(statement)
-    for r in results:
+    r = results.first()
+    if r != None:
       isMatch = False
       try:
         isMatch = nacl.pwhash.verify(r.sessionid.encode(), l.sessionid.encode())
@@ -117,7 +118,8 @@ def deleteOneList(l: ListDeleteOne):
   with Session(engine) as session:
     statement = select(Sessions).where(Sessions.username == l.username)
     results = session.exec(statement)
-    for r in results:
+    r = results.first()
+    if r != None:
       isMatch = False
       try:
         isMatch = nacl.pwhash.verify(r.sessionid.encode(), l.sessionid.encode())
@@ -126,7 +128,8 @@ def deleteOneList(l: ListDeleteOne):
       if isMatch:
         statement2 = select(Todo).where(Todo.id == l.id).where(Todo.username == l.username)
         results2 = session.exec(statement2)
-        for r2 in results2:
+        r2 = results2.first()
+        if r2 != None:
           session.delete(r2)
           session.commit()
         return { "status": "success", "message": "Item deleted" }
@@ -139,7 +142,8 @@ def updateList(l: ListUpdateDetails):
   with Session(engine) as session:
     statement = select(Sessions).where(Sessions.username == l.username)
     results = session.exec(statement)
-    for r in results:
+    r = results.first()
+    if r != None:
       isMatch = False
       try:
         isMatch = nacl.pwhash.verify(r.sessionid.encode(), l.sessionid.encode())
@@ -148,12 +152,13 @@ def updateList(l: ListUpdateDetails):
       if isMatch:
         statement2 = select(Todo).where(Todo.id == l.id).where(Todo.username == l.username)
         results2 = session.exec(statement2)
-        for r2 in results2:
+        r2 = results2.first()
+        if r2 != None:
           r2.item = l.item
           r2.isDone = l.isDone
-        session.add(r2)
-        session.commit()
-        return { "status": "success", "message": "Item updated" }
+          session.add(r2)
+          session.commit()
+          return { "status": "success", "message": "Item updated" }
   return { "status": "failed" }
 
 @app.post("/list/insert")
@@ -163,7 +168,8 @@ def insertList(l: ListInsertDetails):
   with Session(engine) as session:
     statement = select(Sessions).where(Sessions.username == l.username)
     results = session.exec(statement)
-    for r in results:
+    r = results.first()
+    if r != None:
       isMatch = False
       try:
         isMatch = nacl.pwhash.verify(r.sessionid.encode(), l.sessionid.encode())
@@ -182,7 +188,8 @@ def displayList(l: ListDetails):
   with Session(engine) as session:
     statement = select(Sessions).where(Sessions.username == l.username)
     results = session.exec(statement)
-    for r in results:
+    r = results.first()
+    if r != None:
       isMatch = False
       try:
         isMatch = nacl.pwhash.verify(r.sessionid.encode(), l.sessionid.encode())
@@ -204,7 +211,8 @@ def logout(l: LogoutDetails):
   with Session(engine) as session:
     statement = select(Sessions).where(Sessions.username == l.username)
     results = session.exec(statement)
-    for r in results:
+    r = results.first()
+    if r != None:
       isMatch = False
       try:
         isMatch = nacl.pwhash.verify(r.sessionid.encode(), l.sessionid.encode())
@@ -225,7 +233,8 @@ def register(r: RegisterDetails):
   with Session(engine) as session:
     statement = select(Users).where(Users.username == r.username)
     results = session.exec(statement)
-    for u in results:
+    u = results.first()
+    if u != None:
       return { "status": "failed", "message": "Username already exists" }
     passwordHash = nacl.pwhash.str(r.password.encode()).decode()
     session.add(Users(username=r.username, password=passwordHash))
@@ -239,12 +248,14 @@ def login(l: LoginDetails):
   with Session(engine) as session:
     statement = select(Sessions).where(Sessions.username == l.username)
     results = session.exec(statement)
-    for u in results:
+    u = results.first()
+    if u != None:
       return { "status": "failed", "message": "User already logged in" }
     statement = select(Users).where(Users.username == l.username)
     results = session.exec(statement)
     isMatch = False
-    for u in results:
+    u = results.first()
+    if u != None:
       try:
         isMatch = nacl.pwhash.verify(u.password.encode(), l.password.encode())
       except:
