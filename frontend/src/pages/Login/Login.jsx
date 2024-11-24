@@ -128,6 +128,11 @@ function Login() {
   ];
 
   return (
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center"
+    }}>
     <Form
       title={"Login"}
       fields={fields}
@@ -136,6 +141,7 @@ function Login() {
       styles={styles}
       extra="<p>Not registered yet? Register <a href='/register'>here.</a></p>"
     />
+    </div>
   );
 }
 

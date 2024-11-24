@@ -140,6 +140,11 @@ function Register() {
   ];
 
   return (
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center"
+    }}>
     <Form
       title={"Register"}
       fields={fields}
@@ -148,6 +153,7 @@ function Register() {
       styles={styles}
       extra="<p>Already have account? Login <a href='/'>here.</a></p>"
     />
+    </div>
   );
 }
 
