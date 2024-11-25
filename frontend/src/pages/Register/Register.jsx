@@ -143,7 +143,8 @@ function Register() {
     <div style={{
       display: "flex",
       justifyContent: "center",
-      alignItems: "center"
+      alignItems: "center",
+      height: "100vh"
     }}>
     <Form
       title={"Register"}
