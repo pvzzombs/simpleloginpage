@@ -6,52 +6,45 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.goterl.lazysodium.SodiumJava;
 import com.pvzzombs.simplelogintodoapp.backend_java.model.Sessions;
-import com.pvzzombs.simplelogintodoapp.backend_java.model.Todo;
-import com.pvzzombs.simplelogintodoapp.backend_java.requestDetails.InsertListDetails;
+import com.pvzzombs.simplelogintodoapp.backend_java.requestDetails.DeleteAllListDetails;
 import com.pvzzombs.simplelogintodoapp.backend_java.responseDetails.SimpleResponse;
 import com.pvzzombs.simplelogintodoapp.backend_java.service.SessionsService;
 import com.pvzzombs.simplelogintodoapp.backend_java.service.TodoService;
 
 @RestController
-public class Insertlist {
+public class DeleteAllList {
   private final SessionsService sessionsService;
   private final TodoService todoService;
   private SodiumJava sodium;
 
-  public Insertlist(SessionsService sessionsService, TodoService todoService) {
+  public DeleteAllList(SessionsService sessionsService, TodoService todoService) {
     this.sessionsService = sessionsService;
     this.todoService = todoService;
     sodium = new SodiumJava();
   }
 
-  @PostMapping("/list/insert")
-  public SimpleResponse tryInsert(@RequestBody InsertListDetails l) {
+  @PostMapping("/list/delete")
+  public SimpleResponse tryDeleteAll(@RequestBody DeleteAllListDetails l) {
     SimpleResponse response = new SimpleResponse();
-    if (l.getUsername() == "" || l.getSessionid() == "" || l.getItem() == "" || l.getId() == "" || l.getIsDone() == "") {
-      response.setSessionid("");
+    if (l.getUsername() == "" || l.getSessionid() == "") {
       response.setStatus("failed");
+      response.setSessionid("");
       response.setMessage("Blank field");
       return response;
     }
-    // check session
     Sessions s = sessionsService.getSessionById(l.getUsername());
     if (s != null) {
       if (sodium.crypto_pwhash_str_verify(s.getSessionid().getBytes(), l.getSessionid().getBytes(), l.getSessionid().length()) == 0) {
-        Todo t = new Todo();
-        t.setUsername(l.getUsername());
-        t.setItem(l.getItem());
-        t.setId(l.getId());
-        t.setIsDone(l.getIsDone());
-        todoService.createTodo(t);
-        response.setSessionid("");
+        todoService.deleteByUsername(l.getUsername());
         response.setStatus("success");
-        response.setMessage("Insert successful");
+        response.setSessionid("");
+        response.setMessage("Delete all successful");
         return response;
       }
     }
-    response.setSessionid("");
     response.setStatus("failed");
-    response.setMessage("Insert unsuccessful");
+    response.setSessionid("");
+    response.setMessage("Delete all unsuccessful");
     return response;
   }
 }

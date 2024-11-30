@@ -7,25 +7,25 @@ import org.springframework.web.bind.annotation.RestController;
 import com.goterl.lazysodium.SodiumJava;
 import com.pvzzombs.simplelogintodoapp.backend_java.model.Sessions;
 import com.pvzzombs.simplelogintodoapp.backend_java.model.Todo;
-import com.pvzzombs.simplelogintodoapp.backend_java.requestDetails.InsertListDetails;
+import com.pvzzombs.simplelogintodoapp.backend_java.requestDetails.UpdateListDetails;
 import com.pvzzombs.simplelogintodoapp.backend_java.responseDetails.SimpleResponse;
 import com.pvzzombs.simplelogintodoapp.backend_java.service.SessionsService;
 import com.pvzzombs.simplelogintodoapp.backend_java.service.TodoService;
 
 @RestController
-public class Insertlist {
+public class UpdateList {
   private final SessionsService sessionsService;
   private final TodoService todoService;
   private SodiumJava sodium;
 
-  public Insertlist(SessionsService sessionsService, TodoService todoService) {
+  public UpdateList(SessionsService sessionsService, TodoService todoService) {
     this.sessionsService = sessionsService;
     this.todoService = todoService;
     sodium = new SodiumJava();
   }
 
-  @PostMapping("/list/insert")
-  public SimpleResponse tryInsert(@RequestBody InsertListDetails l) {
+  @PostMapping("/list/update")
+  public SimpleResponse tryUpdate(@RequestBody UpdateListDetails l) {
     SimpleResponse response = new SimpleResponse();
     if (l.getUsername() == "" || l.getSessionid() == "" || l.getItem() == "" || l.getId() == "" || l.getIsDone() == "") {
       response.setSessionid("");
@@ -42,16 +42,16 @@ public class Insertlist {
         t.setItem(l.getItem());
         t.setId(l.getId());
         t.setIsDone(l.getIsDone());
-        todoService.createTodo(t);
+        todoService.updateTodo(l.getId(), l.getUsername(), t);
         response.setSessionid("");
         response.setStatus("success");
-        response.setMessage("Insert successful");
+        response.setMessage("Update successful");
         return response;
       }
     }
     response.setSessionid("");
     response.setStatus("failed");
-    response.setMessage("Insert unsuccessful");
+    response.setMessage("Update unsuccessful");
     return response;
   }
 }

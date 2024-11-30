@@ -23,7 +23,7 @@ public class TodoService {
     return todoRepository.findByIdAndUsername(id, username).get();
   }
 
-  public Todo cretaTodo(Todo todo) {
+  public Todo createTodo(Todo todo) {
     return todoRepository.save(todo);
   }
 
