@@ -26,6 +26,9 @@ function Login() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
+    // console.log(username);
+    // console.log(password);
+
     if (username == "" || password == "") {
       alert("Please kindly fill up the required fields.");
       return;
@@ -39,6 +42,7 @@ function Login() {
       .then(function (response) {
         var status = response.data.status;
         if (status === "failed") {
+          console.log(response)
           alert("Login Unsuccessful!");
         } else {
           const sessionid = response.data.sessionid;
@@ -86,62 +90,20 @@ function Login() {
       });
   }
 
-  const styles = {
-    form: {
-      boxShadow: "0px 5px 10px 1px lightgray",
-      borderWidth: "1px",
-      borderColor: "lightgray",
-      borderRadius: "10px",
-      width: "300px",
-    },
-    title: {
-      fontWeight: "bold",
-      fontSize: "20px",
-      marginBottom: "10px",
-    },
-    inputBox: {
-      height: "30px",
-      width: "94%",
-      borderColor: "lightgray",
-      borderWidth: "1px",
-      paddingLeft: "10px",
-    },
-    submitButton: {
-      height: "30px",
-      backgroundColor: "#dedede",
-      borderWidth: "0px",
-    },
-  };
-
-  const fields = [
-    {
-      id: "user",
-      placeholder: "Username",
-      type: "text",
-    },
-    {
-      id: "pw",
-      placeholder: "Password",
-      type: "password",
-      showPasswordText: "Show Password",
-    },
-  ];
-
   return (
-    <div style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "100vh"
+    <div className="container text-center" style={{
+      width: "15%"
     }}>
-    <Form
-      title={"Login"}
-      fields={fields}
-      submitButton={{ label: "Submit" }}
-      formSubmit={{ callback: handleLogin}}
-      styles={styles}
-      extra="<p>Not registered yet? Register <a href='/register'>here.</a></p>"
-    />
+      <form onSubmit={tryLogin} className="row justify-content-center">
+        <div className="col-12">
+          <input type="text" placeholder="Username here" id="username" name="username" className="form-control"/>
+        </div>
+        <div className="col-12">
+          <input type="password" placeholder="Password here" name="password" id="password" className="form-control"/>
+        </div>
+        <input type="submit" value="Login" className="btn"/>
+        <p className="text-center">Not registered yet? Register <a href='/register'>here.</a></p>
+      </form>
     </div>
   );
 }

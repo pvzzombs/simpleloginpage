@@ -92,68 +92,17 @@ function Register() {
       });
   }
 
-  const styles = {
-    form: {
-      boxShadow: "0px 5px 10px 1px lightgray",
-      borderWidth: "1px",
-      borderColor: "lightgray",
-      borderRadius: "10px",
-      width: "300px",
-    },
-    title: {
-      fontWeight: "bold",
-      fontSize: "20px",
-      marginBottom: "10px",
-    },
-    inputBox: {
-      height: "30px",
-      width: "94%",
-      borderColor: "lightgray",
-      borderWidth: "1px",
-      paddingLeft: "10px",
-    },
-    submitButton: {
-      height: "30px",
-      backgroundColor: "#dedede",
-      borderWidth: "0px",
-    },
-  };
-
-  const fields = [
-    {
-      id: "user",
-      placeholder: "Username",
-      type: "text",
-    },
-    {
-      id: "pw",
-      placeholder: "Password",
-      type: "password",
-      showPasswordText: "Show Password",
-    },
-    {
-      id: "pw2",
-      placeholder: "Confirm Password",
-      type: "password",
-      showPasswordText: "Show Password",
-    },
-  ];
-
   return (
-    <div style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "100vh"
-    }}>
-    <Form
-      title={"Register"}
-      fields={fields}
-      submitButton={{ label: "Submit" }}
-      formSubmit={{ callback: handleRegister}}
-      styles={styles}
-      extra="<p>Already have account? Login <a href='/'>here.</a></p>"
-    />
+    <div>
+      <form onSubmit={tryRegister} className="container text-center" style={{
+        width: "15%"
+      }}>
+        <input type="text" placeholder="Email here" id="username" name="username" className="form-control"/>
+        <input type="password" placeholder="Password here" name="password" id="password" className="form-control"/>
+        <input type="password" placeholder="Enter Password again" name="confirmPassword" id="confirmPassword" className="form-control"/>
+        <input type="submit" value="Login" className="btn"/>
+        <p>Already have account? Login <a href='/'>here.</a></p>
+      </form>
     </div>
   );
 }

@@ -167,21 +167,21 @@ function Home() {
     <div className="tw-h-screen tw-grid tw-place-items-center">
       <div className="tw-text-center">
         <h2 className="tw-text-2xl tw-font-bold" id="banner"> Hello {username}! </h2>
-        <input className="tw-d-btn tw-m-1" type="button" value="Logout" id="logout" onClick={tryLogout} />
+        <input className="btn" type="button" value="Logout" id="logout" onClick={tryLogout} />
         <input
-          className="tw-d-btn tw-m-1"
+          className="btn"
           type="button"
           value="Delete all"
           id="delete"
           onClick={tryDelete}
         />
-        <input className="tw-d-btn tw-m-1" type="button" value="Insert" id="insert" onClick={tryInsert} />
+        <input className="btn" type="button" value="Insert" id="insert" onClick={tryInsert} />
         <ul>
           {items.map((item, index) => {
-            return (<li key={index}> <input className="tw-d-checkbox" type="checkbox" checked={item.isDone === "True" ? true : false} id={item.id} onChange={() => { tryUpdate(item.id, item.item) }}/>
+            return (<li className="checkbox" key={index}> <input className="tw-d-checkbox" type="checkbox" checked={item.isDone === "True" ? true : false} id={item.id} onChange={() => { tryUpdate(item.id, item.item) }}/>
             {item.item}
-            <input className="tw-d-btn tw-m-1" type="button" value="Edit" onClick={() => { tryChange(item.id, item.item) }}/>
-            <input className="tw-d-btn tw-m-1" type="button" value="Delete" onClick={(event) => { tryDeleteOnce(event, item.id) }}/> </li>);
+            <input className="btn" type="button" value="Edit" onClick={() => { tryChange(item.id, item.item) }}/>
+            <input className="btn" type="button" value="Delete" onClick={(event) => { tryDeleteOnce(event, item.id) }}/> </li>);
           })}
         </ul>
       </div>
