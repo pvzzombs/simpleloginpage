@@ -4,24 +4,31 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.goterl.lazysodium.SodiumJava;
+// import com.goterl.lazysodium.SodiumJava;
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
+import de.mkammerer.argon2.Argon2Factory.Argon2Types;
+
 import com.pvzzombs.simplelogintodoapp.backend_java.model.Sessions;
 import com.pvzzombs.simplelogintodoapp.backend_java.model.Todo;
 import com.pvzzombs.simplelogintodoapp.backend_java.requestDetails.InsertListDetails;
 import com.pvzzombs.simplelogintodoapp.backend_java.responseDetails.SimpleResponse;
 import com.pvzzombs.simplelogintodoapp.backend_java.service.SessionsService;
 import com.pvzzombs.simplelogintodoapp.backend_java.service.TodoService;
+// import com.pvzzombs.simplelogintodoapp.backend_java.sodium.SodiumLoader;
 
 @RestController
 public class Insertlist {
   private final SessionsService sessionsService;
   private final TodoService todoService;
-  private SodiumJava sodium;
+  private final Argon2 argon2;
+  // private SodiumJava sodium;
 
   public Insertlist(SessionsService sessionsService, TodoService todoService) {
     this.sessionsService = sessionsService;
     this.todoService = todoService;
-    sodium = new SodiumJava();
+    this.argon2 = Argon2Factory.create(Argon2Types.ARGON2id);
+    // sodium = new SodiumJava();
   }
 
   @PostMapping("/list/insert")
@@ -36,7 +43,7 @@ public class Insertlist {
     // check session
     Sessions s = sessionsService.getSessionById(l.getUsername());
     if (s != null) {
-      if (sodium.crypto_pwhash_str_verify(s.getSessionid().getBytes(), l.getSessionid().getBytes(), l.getSessionid().length()) == 0) {
+      if (argon2.verify(s.getSessionid(), l.getSessionid())) {
         Todo t = new Todo();
         t.setUsername(l.getUsername());
         t.setItem(l.getItem());

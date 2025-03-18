@@ -6,7 +6,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.goterl.lazysodium.SodiumJava;
+// import com.goterl.lazysodium.SodiumJava;
+
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
+import de.mkammerer.argon2.Argon2Factory.Argon2Types;
+
 import com.pvzzombs.simplelogintodoapp.backend_java.model.Sessions;
 import com.pvzzombs.simplelogintodoapp.backend_java.model.Todo;
 import com.pvzzombs.simplelogintodoapp.backend_java.requestDetails.GetListsDetails;
@@ -14,17 +19,20 @@ import com.pvzzombs.simplelogintodoapp.backend_java.responseDetails.GetListsInte
 import com.pvzzombs.simplelogintodoapp.backend_java.responseDetails.GetListsResponse;
 import com.pvzzombs.simplelogintodoapp.backend_java.service.SessionsService;
 import com.pvzzombs.simplelogintodoapp.backend_java.service.TodoService;
+// import com.pvzzombs.simplelogintodoapp.backend_java.sodium.SodiumLoader;
 
 @RestController
 public class GetLists {
   private final SessionsService sessionsService;
   private final TodoService todoService;
-  private SodiumJava sodium;
+  private final Argon2 argon2;
+  // private SodiumJava sodium;
 
   public GetLists(SessionsService sessionsService, TodoService todoService) {
     this.sessionsService = sessionsService;
     this.todoService = todoService;
-    sodium = new SodiumJava();
+    this.argon2 = Argon2Factory.create(Argon2Types.ARGON2id);
+    // sodium = new SodiumJava();
   }
 
   @PostMapping("/list")
@@ -41,7 +49,7 @@ public class GetLists {
     // check session
     Sessions s = sessionsService.getSessionById(g.getUsername());
     if (s != null) {
-      if (sodium.crypto_pwhash_str_verify(s.getSessionid().getBytes(), g.getSessionid().getBytes(), g.getSessionid().length()) == 0) {
+      if (argon2.verify(s.getSessionid(), g.getSessionid())) {
         internalData.setList(todoService.getTodoByUsername(g.getUsername()));
         response.setData(internalData);
         response.setStatus("success");
