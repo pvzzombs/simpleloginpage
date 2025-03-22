@@ -27,13 +27,13 @@ public class UsersService {
 
   public Users getUserById(String id) {
     Optional<Users> usr = usersRepository.findById(id);
-    logger.info("Check id: " + id);
+//    logger.info("Check id: " + id);
     if (usr.isPresent()) {
-      logger.info("Its present, but null?");
-      logger.info("Value is " + usr.get().getUsername());
+//      logger.info("Its present, but null?");
+//      logger.info("Value is " + usr.get().getUsername());
       return usr.get();
     }
-    logger.info("Returning null...");
+//    logger.info("Returning null...");
     return null;
   }
 

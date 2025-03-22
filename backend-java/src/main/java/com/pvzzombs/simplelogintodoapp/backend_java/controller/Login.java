@@ -39,7 +39,7 @@ public class Login {
     // sodium = new SodiumJava();
     this.argon2 = Argon2Factory.create(Argon2Types.ARGON2id);
     this.logger = LoggerFactory.getLogger(Login.class);
-    logger.info("Hey I am created...");
+//    logger.info("Hey I am created...");
   }
 
   @PostMapping("/login")
@@ -58,7 +58,7 @@ public class Login {
       return response;
     }
     Users usr;
-    logger.info("Username: " + l.getUsername());
+//    logger.info("Username: " + l.getUsername());
     usr = usersService.getUserById(l.getUsername());
     if (usr != null) {
       if (argon2.verify(usr.getPassword(), l.getPassword())) {
@@ -83,11 +83,11 @@ public class Login {
           return response;
         }
       } else {
-        logger.info("Password verifying failed");
+//        logger.info("Password verifying failed");
       }
     }
 
-    logger.info("Its possible usr is null, " + usr.getUsername());
+//    logger.info("Its possible usr is null, " + usr.getUsername());
 
 
     response.setStatus("failed");
