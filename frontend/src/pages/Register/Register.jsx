@@ -100,7 +100,7 @@ function Register() {
         <input type="text" placeholder="Email here" id="username" name="username" className="form-control"/>
         <input type="password" placeholder="Password here" name="password" id="password" className="form-control"/>
         <input type="password" placeholder="Enter Password again" name="confirmPassword" id="confirmPassword" className="form-control"/>
-        <input type="submit" value="Login" className="btn"/>
+        <input type="submit" value="Register" className="btn"/>
         <p>Already have account? Login <a href='/'>here.</a></p>
       </form>
     </div>
